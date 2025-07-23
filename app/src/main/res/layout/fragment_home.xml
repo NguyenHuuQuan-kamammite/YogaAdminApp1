@@ -26,4 +26,11 @@
         android:layout_height="wrap_content"
         android:text="Class Instance Management" />
 
+    <com.google.android.material.button.MaterialButton
+        android:id="@+id/btnSync"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="Sync to Cloud"
+        android:layout_marginBottom="16dp" />
+
 </LinearLayout> 
