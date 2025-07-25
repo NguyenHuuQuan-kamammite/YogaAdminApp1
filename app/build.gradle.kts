@@ -47,4 +47,6 @@ dependencies {
     implementation(platform(libs.firebase.bom))
     implementation(libs.firebase.auth)
     implementation(libs.okhttp)
+    implementation(libs.glide)
+    implementation(libs.firebase.storage)
 }
