@@ -18,7 +18,7 @@ public class DatabaseHelper extends SQLiteOpenHelper {
     @Override
     public void onCreate(SQLiteDatabase db) {
         db.execSQL("CREATE TABLE IF NOT EXISTS courses (id INTEGER PRIMARY KEY AUTOINCREMENT, dayOfWeek TEXT, time TEXT, capacity INTEGER, durationMinutes INTEGER, price REAL, classType TEXT, description TEXT)");
-        db.execSQL("CREATE TABLE IF NOT EXISTS teachers (id INTEGER PRIMARY KEY AUTOINCREMENT, name TEXT, email TEXT, phone TEXT, bio TEXT, photoUri TEXT, isSynced INTEGER DEFAULT 0)");
+        db.execSQL("CREATE TABLE IF NOT EXISTS teachers (id INTEGER PRIMARY KEY AUTOINCREMENT, name TEXT, email TEXT, phone TEXT, bio TEXT, photoUri TEXT)");
         db.execSQL("CREATE TABLE IF NOT EXISTS instances (id INTEGER PRIMARY KEY AUTOINCREMENT, courseId INTEGER, teacherId INTEGER, date TEXT, comments TEXT)");
     }
 
@@ -69,30 +69,6 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         }
         cursor.close();
         return teachers;
-    }
-
-    public List<Teacher> getUnsyncedTeachers() {
-        List<Teacher> teachers = new ArrayList<>();
-        SQLiteDatabase db = this.getReadableDatabase();
-        Cursor cursor = db.rawQuery("SELECT * FROM teachers WHERE isSynced = 0", null);
-        while (cursor.moveToNext()) {
-            Teacher teacher = new Teacher(
-                String.valueOf(cursor.getInt(cursor.getColumnIndexOrThrow("id"))),
-                cursor.getString(cursor.getColumnIndexOrThrow("name")),
-                cursor.getString(cursor.getColumnIndexOrThrow("email")),
-                cursor.getString(cursor.getColumnIndexOrThrow("phone")),
-                cursor.getString(cursor.getColumnIndexOrThrow("bio")),
-                cursor.getString(cursor.getColumnIndexOrThrow("photoUri"))
-            );
-            teachers.add(teacher);
-        }
-        cursor.close();
-        return teachers;
-    }
-
-    public void markTeacherAsSynced(int localId) {
-        SQLiteDatabase db = this.getWritableDatabase();
-        db.execSQL("UPDATE teachers SET isSynced = 1 WHERE id = ?", new Object[]{localId});
     }
 
     // --- ClassInstance CRUD ---
@@ -157,5 +133,53 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         }
         cursor.close();
         return course;
+    }
+
+    // Clear all data from all tables
+    public void clearAllData() {
+        SQLiteDatabase db = this.getWritableDatabase();
+        db.delete("courses", null, null);
+        db.delete("teachers", null, null);
+        db.delete("instances", null, null);
+    }
+
+    // Upsert (insert or replace) teacher by ID
+    public void upsertTeacher(Teacher teacher) {
+        SQLiteDatabase db = this.getWritableDatabase();
+        android.content.ContentValues values = new android.content.ContentValues();
+        values.put("id", Integer.parseInt(teacher.id));
+        values.put("name", teacher.name);
+        values.put("email", teacher.email);
+        values.put("phone", teacher.phone);
+        values.put("bio", teacher.bio);
+        values.put("photoUri", teacher.photoUri);
+        db.insertWithOnConflict("teachers", null, values, SQLiteDatabase.CONFLICT_REPLACE);
+    }
+
+    // Upsert (insert or replace) course by ID
+    public void upsertCourse(Course course) {
+        SQLiteDatabase db = this.getWritableDatabase();
+        android.content.ContentValues values = new android.content.ContentValues();
+        values.put("id", course.localId);
+        values.put("dayOfWeek", course.dayOfWeek);
+        values.put("time", course.time);
+        values.put("capacity", course.capacity);
+        values.put("durationMinutes", course.durationMinutes);
+        values.put("price", course.price);
+        values.put("classType", course.classType);
+        values.put("description", course.description);
+        db.insertWithOnConflict("courses", null, values, SQLiteDatabase.CONFLICT_REPLACE);
+    }
+
+    // Upsert (insert or replace) class instance by ID
+    public void upsertInstance(ClassInstance instance) {
+        SQLiteDatabase db = this.getWritableDatabase();
+        android.content.ContentValues values = new android.content.ContentValues();
+        values.put("id", instance.id);
+        values.put("courseId", instance.courseId);
+        values.put("teacherId", instance.teacherId);
+        values.put("date", instance.date);
+        values.put("comments", instance.comments);
+        db.insertWithOnConflict("instances", null, values, SQLiteDatabase.CONFLICT_REPLACE);
     }
 } 

@@ -42,6 +42,8 @@ public class ClassInstanceFragment extends Fragment {
     private HashMap<Integer, String> teacherIdNameMap = new HashMap<>();
     private List<Teacher> teacherList = new ArrayList<>();
     private Course course;
+    private String highlightTeacher = null;
+    private String highlightDate = null;
 
     public static ClassInstanceFragment newInstance(int courseId) {
         ClassInstanceFragment fragment = new ClassInstanceFragment();
@@ -115,8 +117,13 @@ public class ClassInstanceFragment extends Fragment {
             }
             instanceList.clear();
             instanceList.addAll(filtered);
+            highlightTeacher = selectedTeacher.equals("All") ? null : selectedTeacher;
+            highlightDate = date.isEmpty() ? null : date;
             adapter.notifyDataSetChanged();
         });
+        // Enable the add button for class instance
+        View fabAddInstance = view.findViewById(R.id.fabAddInstance);
+        fabAddInstance.setOnClickListener(v -> showAddEditDialog(null));
         return view;
     }
 
@@ -242,8 +249,9 @@ public class ClassInstanceFragment extends Fragment {
         @Override
         public void onBindViewHolder(@NonNull InstanceViewHolder holder, int position) {
             ClassInstance instance = instanceList.get(position);
-            holder.tvDate.setText(instance.date);
-            holder.tvTeacherName.setText("Teacher: " + (teacherIdNameMap.get(instance.teacherId) != null ? teacherIdNameMap.get(instance.teacherId) : "?"));
+            String teacherName = teacherIdNameMap.get(instance.teacherId) != null ? teacherIdNameMap.get(instance.teacherId) : "?";
+            holder.tvDate.setText(highlight(instance.date, highlightDate));
+            holder.tvTeacherName.setText("Teacher: " + highlight(teacherName, highlightTeacher));
             holder.tvComments.setText(instance.comments);
             holder.btnEdit.setOnClickListener(v -> showAddEditDialog(instance));
             holder.btnDelete.setOnClickListener(v -> {
@@ -260,6 +268,11 @@ public class ClassInstanceFragment extends Fragment {
         }
         @Override
         public int getItemCount() { return instanceList.size(); }
+        private android.text.Spanned highlight(String text, String query) {
+            if (query == null || query.isEmpty()) return android.text.Html.fromHtml(text);
+            String regex = java.util.regex.Pattern.quote(query);
+            return android.text.Html.fromHtml(text.replaceAll("(?i)"+regex, "<b><font color='#FF8800'>"+query+"</font></b>"));
+        }
         class InstanceViewHolder extends RecyclerView.ViewHolder {
             TextView tvDate, tvTeacherName, tvComments;
             View btnEdit, btnDelete;

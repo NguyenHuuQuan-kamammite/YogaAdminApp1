@@ -75,14 +75,14 @@
             android:src="@drawable/ic_person_add" />
 
         <ImageButton
-            android:id="@+id/btnSync"
+            android:id="@+id/btnMoreActions"
             android:layout_width="40dp"
             android:layout_height="40dp"
             android:layout_marginStart="8dp"
             android:background="@android:color/transparent"
-            android:contentDescription="Sync to Cloud"
+            android:contentDescription="More Actions"
             android:padding="8dp"
-            android:src="@android:drawable/ic_menu_upload" />
+            android:src="@android:drawable/ic_menu_more" />
     </LinearLayout>
 
     <androidx.recyclerview.widget.RecyclerView
