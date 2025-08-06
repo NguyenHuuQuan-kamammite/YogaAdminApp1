@@ -48,9 +48,7 @@ public class AdminLoginFragment extends Fragment {
 
         binding.btnLogin.setOnClickListener(v -> attemptLogin());
         
-        // For testing purposes, you can pre-fill admin credentials
-        // binding.editTextUsername.setText("admin@example.com");
-        // binding.editTextPassword.setText("admin123");
+
     }
 
     private void attemptLogin() {
@@ -158,7 +156,7 @@ public class AdminLoginFragment extends Fragment {
     private void createAdminUser(String uid) {
         FirebaseFirestore db = FirebaseFirestore.getInstance();
         
-        // Create admin user data
+
         Map<String, Object> adminData = new HashMap<>();
         adminData.put("role", "admin");
         adminData.put("createdAt", new Date());
