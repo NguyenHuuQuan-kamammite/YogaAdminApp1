@@ -71,9 +71,19 @@ public class ClassInstanceFragment extends Fragment {
         loadTeachers();
         loadInstances();
         // UI references
+        ImageButton btnBackToHome = view.findViewById(R.id.btnBackToHome);
         Spinner spinnerTeacher = view.findViewById(R.id.spinnerSearchInstanceTeacher);
         EditText editDate = view.findViewById(R.id.editSearchInstanceDate);
         ImageButton btnSearch = view.findViewById(R.id.btnSearchInstance);
+        
+        // Back button to navigate to HomeFragment
+        btnBackToHome.setOnClickListener(v -> {
+            requireActivity().getSupportFragmentManager()
+                .beginTransaction()
+                .replace(R.id.fragment_container, new HomeFragment())
+                .addToBackStack(null)
+                .commit();
+        });
         // Populate teacher spinner
         List<String> teacherNames = new ArrayList<>();
         teacherNames.add("All");

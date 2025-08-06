@@ -37,6 +37,7 @@ import android.widget.LinearLayout;
 import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.widget.PopupMenu;
+import com.google.firebase.auth.FirebaseAuth;
 
 public class HomeFragment extends Fragment {
     private DatabaseHelper dbHelper;
@@ -131,6 +132,7 @@ public class HomeFragment extends Fragment {
         popup.getMenu().add("Sync to Cloud");
         popup.getMenu().add("Restore from Cloud");
         popup.getMenu().add("Reset Database");
+        popup.getMenu().add("Logout");
         popup.setOnMenuItemClickListener(item -> {
             String title = item.getTitle().toString();
             if (title.equals("Sync to Cloud")) {
@@ -150,6 +152,21 @@ public class HomeFragment extends Fragment {
                         dbHelper.clearAllData();
                         refreshCourseList();
                         Toast.makeText(getContext(), "Local database reset.", Toast.LENGTH_LONG).show();
+                    })
+                    .setNegativeButton("Cancel", null)
+                    .show();
+                return true;
+            } else if (title.equals("Logout")) {
+                new AlertDialog.Builder(getContext())
+                    .setTitle("Logout")
+                    .setMessage("Are you sure you want to logout?")
+                    .setPositiveButton("Logout", (dialog, which) -> {
+                        FirebaseAuth.getInstance().signOut();
+                        // Navigate back to login screen
+                        requireActivity().getSupportFragmentManager()
+                            .beginTransaction()
+                            .replace(R.id.fragment_container, new AdminLoginFragment())
+                            .commit();
                     })
                     .setNegativeButton("Cancel", null)
                     .show();
